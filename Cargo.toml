@@ -1,0 +1,5 @@
+[package]
+name = "cell"
+version = "0.1.0"
+authors = ["charles <charles.mcallister@dunnker.com>"]
+license-file = "license.txt"
