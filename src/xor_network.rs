@@ -95,7 +95,7 @@ impl Experiment<XORNetwork> for XORNetworkExperiment {
 
 	fn mutate(&mut self, member: &mut XORNetwork) {
         const MUTATION_RATE: f32 = 0.3f32;
-        const MUTATION_RANGE: f32 = 0.20f32;
+        const MUTATION_RANGE: f32 = 0.50f32;
 
         for i in 0..member.input_weights.len() {
             for j in 0..member.input_weights[i].len() {
