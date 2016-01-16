@@ -71,7 +71,7 @@ impl<M> Population<M> where M: Member {
 	}
 }
 
-pub trait GAHost<M: Member> {
+pub trait Experiment<M: Member> {
 	fn create_member(&mut self) -> M;
 	fn evaluate_member(&mut self, member: &mut M);
 	fn mutate(&mut self, member: &mut M);
@@ -89,22 +89,22 @@ impl GA {
 		}
 	}
 
-	pub fn new_population<M: Member>(&self, member_count: u16, ga_host: &mut GAHost<M>) -> Population<M> {
+	pub fn new_population<M: Member>(&self, member_count: u16, experiment: &mut Experiment<M>) -> Population<M> {
 		let mut result: Population<M> = Population::new();
 		for _ in 1..member_count {
-			let member = ga_host.create_member();
+			let member = experiment.create_member();
 			result.add_member(member);
 		}
 		result
 	}
 
-	pub fn evaluate_population<M: Member>(&self, population: &mut Population<M>, ga_host: &mut GAHost<M>) {
+	pub fn evaluate_population<M: Member>(&self, population: &mut Population<M>, experiment: &mut Experiment<M>) {
 		for mut member in population.get_members() {
-			ga_host.evaluate_member(&mut member);
+			experiment.evaluate_member(&mut member);
 		}
 	}
 
-	pub fn new_generation<M: Member>(&mut self, population: &mut Population<M>, ga_host: &mut GAHost<M>) -> Population<M> {
+	pub fn new_generation<M: Member>(&mut self, population: &mut Population<M>, experiment: &mut Experiment<M>) -> Population<M> {
 		// tournament size is 5% of the total population size
 		let mut tournament_size: u16 = ((population.get_members().len() as f32) * 0.05f32) as u16;
 		if tournament_size < 2 {
@@ -116,9 +116,9 @@ impl GA {
 			let member1 = population.get_random_member(tournament_size, &mut self.rng);
 			let member2 = population.get_random_member(tournament_size, &mut self.rng);
 
-			let mut new_member = ga_host.crossover(member1, member2);
+			let mut new_member = experiment.crossover(member1, member2);
 
-			ga_host.mutate(&mut new_member);
+			experiment.mutate(&mut new_member);
 
 			result.add_member(new_member);
 		}

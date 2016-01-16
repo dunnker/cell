@@ -34,25 +34,25 @@ impl XORNetwork {
 	}
 }
 
-pub struct XORNetworkGAHost {
+pub struct XORNetworkExperiment {
     rng: rand::StdRng,
 }
 
-impl XORNetworkGAHost {
-	pub fn new() -> XORNetworkGAHost {
-		XORNetworkGAHost {
+impl XORNetworkExperiment {
+	pub fn new() -> XORNetworkExperiment {
+		XORNetworkExperiment {
             rng: rand::StdRng::new().unwrap(),
 		}
 	}
 }
 
-impl XORNetworkGAHost {
+impl XORNetworkExperiment {
 	pub fn get_xor_fitness(&self, member: &XORNetwork, truth_value: f32, output: f32) -> f32 {
         member.get_fitness() + (truth_value - output).abs().powf(2.0f32)
 	}
 }
 
-impl GAHost<XORNetwork> for XORNetworkGAHost {
+impl Experiment<XORNetwork> for XORNetworkExperiment {
 	fn evaluate_member(&mut self, member: &mut XORNetwork) {
 		let mut outputs: [f32; OUTPUT_COUNT as usize] = [0.0f32; OUTPUT_COUNT as usize];
         let mut inputs: [f32; (INPUT_COUNT + 1) as usize] = [1.0f32, 1.0f32, 1.0f32];
