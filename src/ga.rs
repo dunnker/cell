@@ -1,5 +1,5 @@
 extern crate rand;
-use rand::Rng;
+use rand::{ Rng, StdRng };
 
 pub trait Member {
 	fn get_fitness(&self) -> f32;
@@ -47,7 +47,7 @@ impl<M> Population<M> where M: Member {
 	}
 
     /// Use tournament selection to find a random member in the population
-	pub fn get_random_member(&self, tournament_size: u16, rng: &mut rand::ThreadRng) -> &M {
+	pub fn get_random_member(&self, tournament_size: u16, rng: &mut rand::StdRng) -> &M {
 		assert!(self.members.len() > 1);
 
 		// choose member with best fitness out of the tournament's random members
@@ -79,19 +79,19 @@ pub trait GAHost<M: Member> {
 }
 
 pub struct GA {
-    rng: rand::ThreadRng,
+    rng: rand::StdRng,
 }
 
 impl GA {
 	pub fn new() -> GA {
 		GA {
-            rng: rand::thread_rng(),
+            rng: rand::StdRng::new().unwrap(),
 		}
 	}
 
 	pub fn new_population<M: Member>(&self, member_count: u16, ga_host: &mut GAHost<M>) -> Population<M> {
 		let mut result: Population<M> = Population::new();
-		for _ in 0..member_count {
+		for _ in 1..member_count {
 			let member = ga_host.create_member();
 			result.add_member(member);
 		}
@@ -116,7 +116,9 @@ impl GA {
 			let member1 = population.get_random_member(tournament_size, &mut self.rng);
 			let member2 = population.get_random_member(tournament_size, &mut self.rng);
 
-			let new_member = ga_host.crossover(member1, member2);
+			let mut new_member = ga_host.crossover(member1, member2);
+
+			ga_host.mutate(&mut new_member);
 
 			result.add_member(new_member);
 		}

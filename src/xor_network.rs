@@ -1,6 +1,6 @@
 extern crate rand;
 
-use rand::Rng;
+use rand::{Rng, StdRng};
 use ga::*;
 use network::*;
 
@@ -35,13 +35,13 @@ impl XORNetwork {
 }
 
 pub struct XORNetworkGAHost {
-    rng: rand::ThreadRng,
+    rng: rand::StdRng,
 }
 
 impl XORNetworkGAHost {
 	pub fn new() -> XORNetworkGAHost {
 		XORNetworkGAHost {
-            rng: rand::thread_rng(),
+            rng: rand::StdRng::new().unwrap(),
 		}
 	}
 }
@@ -94,8 +94,8 @@ impl GAHost<XORNetwork> for XORNetworkGAHost {
 	}
 
 	fn mutate(&mut self, member: &mut XORNetwork) {
-        const MUTATION_RATE: f32 = 0.2f32;
-        const MUTATION_RANGE: f32 = 0.04f32;
+        const MUTATION_RATE: f32 = 0.3f32;
+        const MUTATION_RANGE: f32 = 0.20f32;
 
         for i in 0..member.input_weights.len() {
             for j in 0..member.input_weights[i].len() {

@@ -1,5 +1,5 @@
 extern crate rand;
-use rand::Rng;
+use rand::{Rng, StdRng};
 use std;
 
 pub struct SigmoidActivationFunction;
@@ -14,7 +14,7 @@ impl SigmoidActivationFunction {
 pub struct Network;
 
 impl Network {
-	pub fn initialize_single_hidden_layer(rng: &mut rand::ThreadRng, input_weights: &mut Vec<Vec<f32>>, 
+	pub fn initialize_single_hidden_layer(rng: &mut rand::StdRng, input_weights: &mut Vec<Vec<f32>>, 
 		output_weights: &mut Vec<Vec<f32>>) {
 		// assign random weight values
 		for n in 0..input_weights.len() {
