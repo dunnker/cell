@@ -31,14 +31,14 @@ impl<M> Population<M> where M: Member {
 
 		let mut result: Option<&M> = None;
 		for i in 0..self.members.len() {
-        	let better_fitness =
-	        	match result {
-	        		None => true,
-	        		Some(ref p) => self.members[i].get_fitness() > p.get_fitness()
-	        	};
-        	if better_fitness {
-	        	result = Some(&self.members[i]);
-	        }
+			let better_fitness =
+				match result {
+					None => true,
+					Some(ref p) => self.members[i].get_fitness() > p.get_fitness()
+				};
+			if better_fitness {
+				result = Some(&self.members[i]);
+			}
 		}
 		match result {
 			None => &self.members[0], // should never happen per assert above
@@ -46,23 +46,23 @@ impl<M> Population<M> where M: Member {
 		}
 	}
 
-    /// Use tournament selection to find a random member in the population
+	/// Use tournament selection to find a random member in the population
 	pub fn get_random_member(&self, tournament_size: u16, rng: &mut rand::StdRng) -> &M {
 		assert!(self.members.len() > 1);
 
 		// choose member with best fitness out of the tournament's random members
 		let mut result: Option<&M> = None;
-        for i in 0..tournament_size {
-        	let index: usize = rng.gen_range(0, self.members.len());
-        	let better_fitness =
-	        	match result {
-	        		None => true,
-	        		Some(ref p) => self.members[index].get_fitness() > p.get_fitness()
-	        	};
-        	if better_fitness {
-	        	result = Some(&self.members[i as usize]);
-        	}
-        }
+		for i in 0..tournament_size {
+			let index: usize = rng.gen_range(0, self.members.len());
+			let better_fitness =
+				match result {
+					None => true,
+					Some(ref p) => self.members[index].get_fitness() > p.get_fitness()
+				};
+			if better_fitness {
+				result = Some(&self.members[i as usize]);
+			}
+		}
 
 		match result {
 			None => &self.members[0], // should never happen per assert above
@@ -79,13 +79,13 @@ pub trait Experiment<M: Member> {
 }
 
 pub struct GA {
-    rng: rand::StdRng,
+	rng: rand::StdRng,
 }
 
 impl GA {
 	pub fn new() -> GA {
 		GA {
-            rng: rand::StdRng::new().unwrap(),
+			rng: rand::StdRng::new().unwrap(),
 		}
 	}
 
