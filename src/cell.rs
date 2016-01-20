@@ -172,8 +172,8 @@ impl Experiment<CellMember> for CellExperiment {
     }
 
     fn mutate(&mut self, member: &mut CellMember) {
-        const MUTATION_RATE: f32 = 0.2f32;
-        const MUTATION_RANGE: f32 = 0.04f32;
+        const MUTATION_RATE: f32 = 0.3f32;
+        const MUTATION_RANGE: f32 = 5.0f32;
 
         for i in 0..member.input_weights.len() {
             for j in 0..member.input_weights[i].len() {
