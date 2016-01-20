@@ -35,12 +35,14 @@ pub const OUTPUT_COUNT: usize = 4;
 
 impl CellMember {     
     pub fn new() -> CellMember {         
-        CellMember {
+        let mut cell_member = CellMember {
             fitness: 0.0f32,      
             cells: [[Cell::default(); WORLD_SIZE]; WORLD_SIZE],       
             input_weights: vec![vec![0.0f32; HIDDEN_COUNT]; INPUT_COUNT + 1],
             output_weights: vec![vec![0.0f32; OUTPUT_COUNT]; HIDDEN_COUNT + 1],
-        }
+        };
+        cell_member.cells[0][0].alive = true;
+        cell_member
     }
 
     pub fn get_cells(&self) -> [[Cell; WORLD_SIZE]; WORLD_SIZE] {
@@ -66,9 +68,10 @@ impl CellExperiment {
     }
 
     fn assign_position_inputs(&self, member: &CellMember, inputs: &mut [f32; INPUT_COUNT + 1], index: usize, 
-        x: usize, y: usize)
+        x: i32, y: i32)
     {
-        if x >= 0 && x < WORLD_SIZE && y >= 0 && y < WORLD_SIZE && member.cells[x][y].alive {
+        if x >= 0 && (x as usize) < WORLD_SIZE && y >= 0 && (y as usize) < WORLD_SIZE && 
+            member.cells[x as usize][y as usize].alive {
             inputs[index] = 1.0f32;
         } else {
             inputs[index] = 0.0f32;
@@ -76,8 +79,8 @@ impl CellExperiment {
     }
 
     fn evaluate_cell(&mut self, inputs: &mut [f32; INPUT_COUNT + 1], outputs: &mut [f32; OUTPUT_COUNT], 
-        member: &mut CellMember, x: usize, y: usize) {
-        if member.cells[x][y].alive {
+        member: &mut CellMember, x: i32, y: i32) {
+        if member.cells[x as usize][y as usize].alive {
             let inputs_len = inputs.len();
             inputs[inputs_len - 1] = 1.0f32; // bias
 
@@ -90,7 +93,7 @@ impl CellExperiment {
             self.assign_position_inputs(member, inputs, 6, x, y + 1);
             self.assign_position_inputs(member, inputs, 7, x + 1, y + 1);
 
-            inputs[8] = member.cells[x][y].generation as f32;
+            inputs[8] = member.cells[x as usize][y as usize].generation as f32;
 
             Network::feed_forward_single_hidden_layer(inputs, outputs, &member.input_weights, &member.output_weights);
 
@@ -113,15 +116,15 @@ impl CellExperiment {
                     if next_x >= 0 && ((next_x as usize) < WORLD_SIZE) && next_y >= 0 && ((next_y as usize) < WORLD_SIZE) && 
                         !member.cells[next_x as usize][next_y as usize].alive {
                         member.cells[next_x as usize][next_y as usize].alive = true;
-                        member.cells[next_x as usize][next_y as usize].generation = member.cells[x][y].generation + 1;
+                        member.cells[next_x as usize][next_y as usize].generation = member.cells[x as usize][y as usize].generation + 1;
                     }
                 }
             }
 
             if outputs[3] < -0.5 {
-                member.cells[x][y].alive = false;
+                member.cells[x as usize][y as usize].alive = false;
             } else if outputs[3] > 0.5 {
-                member.cells[x][y].alive = false;
+                member.cells[x as usize][y as usize].alive = false;
             }
         }
     }
@@ -137,7 +140,7 @@ impl Experiment<CellMember> for CellExperiment {
         for _ in 0..turn_count {
             for x in 0..WORLD_SIZE {
                 for y in 0..WORLD_SIZE {
-                    self.evaluate_cell(&mut inputs, &mut outputs, member, x, y);
+                    self.evaluate_cell(&mut inputs, &mut outputs, member, x as i32, y as i32);
                 }
             }
         }
@@ -168,8 +171,8 @@ impl Experiment<CellMember> for CellExperiment {
     }
 
     fn mutate(&mut self, member: &mut CellMember) {
-        const MUTATION_RATE: f32 = 0.3f32;
-        const MUTATION_RANGE: f32 = 0.50f32;
+        const MUTATION_RATE: f32 = 0.2f32;
+        const MUTATION_RANGE: f32 = 0.04f32;
 
         for i in 0..member.input_weights.len() {
             for j in 0..member.input_weights[i].len() {

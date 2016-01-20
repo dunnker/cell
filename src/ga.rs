@@ -106,7 +106,7 @@ impl GA {
 
     pub fn new_generation<M: Member>(&mut self, population: &mut Population<M>, experiment: &mut Experiment<M>) -> Population<M> {
         // tournament size is 5% of the total population size
-        let mut tournament_size: u16 = ((population.get_members().len() as f32) * 0.05f32) as u16;
+        let mut tournament_size: u16 = ((population.get_members().len() as f32) * 0.04f32) as u16;
         if tournament_size < 2 {
             tournament_size = 2;
         }

@@ -42,12 +42,13 @@ const LINE_HEIGHT: f64 = 40f64;
 const STATUS_LEFT_MARGIN: f64 = 400f64;
 const STATUS_TOP_MARGIN: f64 = 100f64;
 
+const POP_COUNT: u16 = 500;
+
 struct App {
     gl: GlGraphics,
     cache: GlyphCache<'static>,
     ga: GA,
     generation: u32,
-    evolving: bool,
     experiment: CellExperiment,
     population: Option<Population<CellMember>>,
     member_fitness: f32,
@@ -122,29 +123,34 @@ impl App {
     }
 
     fn update(&mut self, args: &UpdateArgs) {
-        if self.population.is_some() && self.evolving {
-            self.population = {
-                let mut some_population = self.population.as_mut().unwrap();
-                self.ga.evaluate_population(&mut some_population, &mut self.experiment);
-                {
-                    let member = some_population.get_fittest_member();
-                    self.member_fitness = member.get_fitness();
-                    self.member_cells = member.get_cells();
-                }
-                self.generation += 1;
-                Some(self.ga.new_generation(&mut some_population, &mut self.experiment))
-            }
-        }
+
     }
 
     fn key_pressed(&mut self, key: keyboard::Key) {
         match key {
             Key::S => {
-                if self.population.is_none() && !self.evolving {
+                if self.population.is_none() {
                     self.generation = 0;
-                    self.population = Some(self.ga.new_population(1000, &mut self.experiment));
-                    self.evolving = true;
+                    self.member_fitness = 0.0f32;
+                    self.member_cells = [[Cell::default(); WORLD_SIZE]; WORLD_SIZE];
+                    self.population = Some(self.ga.new_population(POP_COUNT, &mut self.experiment));
                 }
+
+                let mut new_population: Option<Population<CellMember>> = None;
+                {
+                    let mut some_population = self.population.as_mut().unwrap();
+                    self.ga.evaluate_population(&mut some_population, &mut self.experiment);
+                    {
+                        let member = some_population.get_fittest_member();
+                        self.member_fitness = member.get_fitness();
+                        self.member_cells = member.get_cells();
+                    }
+                    self.generation += 1;
+                    println!("{}", self.generation);
+                    new_population = Some(self.ga.new_generation(&mut some_population, &mut self.experiment));
+                }
+
+                self.population = new_population;
             },
 
             _ => { }
@@ -189,7 +195,6 @@ fn start_app() {
         cache: GlyphCache::new(font_path).unwrap(),
         ga: ga::GA::new(),
         generation: 0,
-        evolving: false,
         experiment: CellExperiment::new(),
         population: None,
         member_fitness: 0.0f32,
