@@ -111,12 +111,13 @@ impl CellExperiment {
                     next_y = -1;
                 }
                 if next_x != 0 || next_y != 0 {
-                    next_x += x as i32;
-                    next_y += y as i32;
-                    if next_x >= 0 && ((next_x as usize) < WORLD_SIZE) && next_y >= 0 && ((next_y as usize) < WORLD_SIZE) && 
+                    next_x += x;
+                    next_y += y;
+                    if next_x >= 0 && (next_x as usize) < WORLD_SIZE && next_y >= 0 && (next_y as usize) < WORLD_SIZE && 
                         !member.cells[next_x as usize][next_y as usize].alive {
                         member.cells[next_x as usize][next_y as usize].alive = true;
-                        member.cells[next_x as usize][next_y as usize].generation = member.cells[x as usize][y as usize].generation + 1;
+                        member.cells[next_x as usize][next_y as usize].generation = 
+                            member.cells[x as usize][y as usize].generation + 1;
                     }
                 }
             }
@@ -195,7 +196,7 @@ impl Experiment<CellMember> for CellExperiment {
         let mut result = CellMember::new();
 
         // crossover input layer
-        let index = (self.rng.next_f32() * member1.input_weights.len() as f32) as i32;
+        let index = self.rng.gen_range(0, member1.input_weights.len()) as i32;
         for i in 0..index as usize {
             for j in 0..result.input_weights[i].len() {
                 result.input_weights[i][j] = member1.input_weights[i][j];
@@ -209,7 +210,7 @@ impl Experiment<CellMember> for CellExperiment {
         }
 
         // crossover output layer
-        let index = (self.rng.next_f32() * member1.output_weights.len() as f32) as i32;
+        let index = self.rng.gen_range(0, member1.output_weights.len()) as i32;
         for i in 0..index as usize {
             for j in 0..result.output_weights[i].len() {
                 result.output_weights[i][j] = member1.output_weights[i][j];

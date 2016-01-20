@@ -60,7 +60,7 @@ impl<M> Population<M> where M: Member {
                     Some(ref p) => self.members[index].get_fitness() > p.get_fitness()
                 };
             if better_fitness {
-                result = Some(&self.members[i as usize]);
+                result = Some(&self.members[index]);
             }
         }
 
@@ -91,7 +91,7 @@ impl GA {
 
     pub fn new_population<M: Member>(&self, member_count: u16, experiment: &mut Experiment<M>) -> Population<M> {
         let mut result: Population<M> = Population::new();
-        for _ in 1..member_count {
+        for _ in 0..member_count {
             let member = experiment.create_member();
             result.add_member(member);
         }
