@@ -11,11 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cellMember.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="xorNetwork.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cellMember.h" />
     <ClInclude Include="ga.h" />
     <ClInclude Include="member.h" />
     <ClInclude Include="network.h" />
