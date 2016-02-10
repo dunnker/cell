@@ -1,2 +1,8 @@
 /Debug/
 /cell/Debug/
+/Release/
+/cell/Release/
+*.suo
+*.opensdf
+*.sdf
+*.filters

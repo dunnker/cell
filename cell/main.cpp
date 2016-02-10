@@ -1,37 +1,16 @@
-#include <iostream>
-#include <memory>
-#include <time.h>
-#include "ga.h"
-#include "population.h"
-#include "member.h"
+#include "sdlUI.h"
+#include "consoleUI.h"
+
 #include "xorNetwork.h"
+#include "cellMember.h"
 
-int main()
+int main(int argc, char *args[])
 {
-    srand((unsigned int)time(NULL));
+    //XORNetworkExperiment experiment;
+    //ConsoleUI::RunExperiment<XORNetworkMember>(experiment);
 
-    XORNetworkExperiment experiment;
-
-    std::unique_ptr<GA::Population<XORNetworkMember>> population = nullptr;
-    for (int generation = 0; generation < 500; generation++)
-    {
-        if (population == nullptr)
-            population = std::make_unique<GA::Population<XORNetworkMember>>(*GA::GA<XORNetworkMember>::NewPopulation(100, experiment));
-        else
-        {
-            auto member = population->GetFittestMember();
-            std::cout << generation << " " << member.GetFitness() << "\n";
-
-            if (member.GetFitness() > 1000)
-                break;
-
-            population = std::make_unique<GA::Population<XORNetworkMember>>(*GA::GA<XORNetworkMember>::NewGeneration(*population, experiment));
-        }
-
-        GA::GA<XORNetworkMember>::EvaluatePopulation(*population, experiment);
-    }
-
-    getchar();
+    CellMemberExperiment experiment;
+    SDLUI::RunExperiment(experiment);
 
     return 0;
 }

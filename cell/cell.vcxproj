@@ -14,6 +14,7 @@
     <ClCompile Include="cellMember.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="network.cpp" />
+    <ClCompile Include="sdlUI.cpp" />
     <ClCompile Include="xorNetwork.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -22,7 +23,9 @@
     <ClInclude Include="member.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="population.h" />
+    <ClInclude Include="sdlUI.h" />
     <ClInclude Include="xorNetwork.h" />
+    <ClInclude Include="consoleUI.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4F714440-4625-4E9F-9AEA-980EC6263468}</ProjectGuid>
@@ -52,7 +55,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\SDL2-2.0.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\SDL2-2.0.4\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\SDL2-2.0.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\SDL2-2.0.4\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -61,6 +71,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,6 +87,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

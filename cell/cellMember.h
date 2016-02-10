@@ -2,6 +2,7 @@
 
 #include "member.h"
 #include "ga.h"
+#include "network.h"
 
 struct Cell
 {
@@ -21,6 +22,8 @@ public:
 
     static const unsigned short int INPUT_COUNT = 9;
     static const unsigned short int OUTPUT_COUNT = 4;
+
+    NeuralNetwork::SingleHiddenLayerNetwork _network;
 
     Cell _world[WORLD_SIZE - 1][WORLD_SIZE - 1];
 
