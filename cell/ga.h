@@ -63,10 +63,10 @@ namespace GA
 
         for (int i = 0; i < population.Count(); i++)
         {
-            auto member1 = population.GetRandomMember(tournamentSize);
-            auto member2 = population.GetRandomMember(tournamentSize);
+            M& member1 = population.GetRandomMember(tournamentSize);
+            M& member2 = population.GetRandomMember(tournamentSize);
 
-            auto newMember = experiment.NewFromCrossover(member1, member2);
+            M* newMember = experiment.NewFromCrossover(member1, member2);
 
             experiment.Mutate(*newMember);
 

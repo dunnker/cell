@@ -36,7 +36,7 @@ namespace GA
     {
         for (auto member : _members)
         {
-            delete(member);
+            delete member;
         }
     }
 

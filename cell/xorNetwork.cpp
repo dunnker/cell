@@ -80,7 +80,7 @@ void XORNetworkExperiment::Mutate(XORNetworkMember& member)
 
 XORNetworkMember* XORNetworkExperiment::NewFromCrossover(XORNetworkMember& member1, XORNetworkMember& member2)
 {
-    auto result = new XORNetworkMember();
+    XORNetworkMember* result = new XORNetworkMember();
     NeuralNetwork::NetworkUtils::CrossoverSingleHiddenLayer(member1._network, member2._network, result->_network);
     return result;
 }
