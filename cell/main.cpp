@@ -6,6 +6,8 @@
 
 int main(int argc, char *args[])
 {
+    srand((unsigned int)time(NULL));
+
     //XORNetworkExperiment experiment;
     //ConsoleUI::RunExperiment<XORNetworkMember>(experiment);
 

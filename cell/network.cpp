@@ -41,7 +41,7 @@ namespace NeuralNetwork
     void NetworkUtils::FeedForwardSingleHiddenLayer(SingleHiddenLayerNetwork& network)
     {
         unsigned short int hiddenSize = network._inputWeightCount + 1;
-        float* hidden = new float[hiddenSize];
+        float hidden[SingleHiddenLayerNetwork::MAX_HIDDEN_COUNT]; // static sized array for performance
         // set bias node
         hidden[hiddenSize - 1] = 1.0f;
 
@@ -59,6 +59,9 @@ namespace NeuralNetwork
         for (int i = 0; i < network._outputCount; i++)
         {
             float sum = 0.0f;
+
+            assert(hiddenSize <= network._outputNodeCount);
+
             for (int j = 0; j < hiddenSize; j++)
             {
                 sum += hidden[j] * network._outputWeights[j][i];
@@ -96,6 +99,8 @@ namespace NeuralNetwork
         // crossover input layer 
         // select random node in parent1, and assign weights from node 0 to that random node, to result
         unsigned short int inputIndex = (unsigned short int)(NeuralNetwork::NetworkUtils::GetRandomFloat() * network._inputNodeCount);
+        assert(inputIndex >= 0 && inputIndex < network._inputNodeCount);
+
         for (int i = 0; i < inputIndex; i++)
         {
             for (int j = 0; j < network._inputWeightCount; j++)
@@ -115,6 +120,8 @@ namespace NeuralNetwork
 
         // crossover output layer; similar to steps above for input layer
         unsigned short int outputIndex = (unsigned short int)(NeuralNetwork::NetworkUtils::GetRandomFloat() * network._outputNodeCount);
+        assert(outputIndex >= 0 && outputIndex < network._outputNodeCount);
+
         for (int i = 0; i < outputIndex; i++)
         {
             for (int j = 0; j < network._outputWeightCount; j++)

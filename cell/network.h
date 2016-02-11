@@ -6,9 +6,11 @@ namespace NeuralNetwork
 {
     struct SingleHiddenLayerNetwork
     {
-        unsigned short int _inputCount;
-        unsigned short int _hiddenCount;
-        unsigned short int _outputCount;
+        static const unsigned short int MAX_HIDDEN_COUNT = 100;
+
+        const unsigned short int _inputCount;
+        const unsigned short int _hiddenCount;
+        const unsigned short int _outputCount;
 
         const unsigned short int _inputNodeCount;
         const unsigned short int _inputWeightCount;
@@ -30,8 +32,11 @@ namespace NeuralNetwork
             _outputNodeCount(hiddenCount + 1),
             _outputWeightCount(outputCount)
         {
+            if (hiddenCount > MAX_HIDDEN_COUNT)
+                throw "hiddenCount exceeds maximum allowable value";
+
             _inputs = new float[_inputNodeCount];
-            _inputs[_inputNodeCount - 1] = 1.0f;
+            _inputs[_inputNodeCount - 1] = 1.0f; // bias value
             _outputs = new float[_outputCount];
 
             _inputWeights = new float*[_inputNodeCount];
@@ -44,6 +49,18 @@ namespace NeuralNetwork
             {
                 _outputWeights[i] = new float[_outputWeightCount];
             }
+        }
+
+        ~SingleHiddenLayerNetwork()
+        {
+            delete[] _inputs;
+            delete[] _outputs;
+            for (int i = 0; i < _inputNodeCount; i++)
+                delete[] _inputWeights[i];
+            delete[] _inputWeights;
+            for (int i = 0; i < _outputNodeCount; i++)
+                delete[] _outputWeights[i];
+            delete[] _outputWeights;
         }
 
         static bool CompareBounds(SingleHiddenLayerNetwork& network1, SingleHiddenLayerNetwork& network2)
@@ -63,7 +80,7 @@ namespace NeuralNetwork
         /// Calculate the outputs for a neural network with a single hidden layer, given its inputs and weights
         static void FeedForwardSingleHiddenLayer(SingleHiddenLayerNetwork& network);
         /// Apply a mutation to the weights of a network
-        static void MutateSingleHiddenLayer(SingleHiddenLayerNetwork& network, float mutationRate = 0.3f, float mutationRange = 0.5f);
+        static void MutateSingleHiddenLayer(SingleHiddenLayerNetwork& network, float mutationRate = 0.3f, float mutationRange = 1.0f);
         /// Initialize weight values in network by using a random portion of weights from parent1 and parent2
         static void CrossoverSingleHiddenLayer(SingleHiddenLayerNetwork& parent1, SingleHiddenLayerNetwork& parent2, SingleHiddenLayerNetwork& network);
     private:

@@ -11,6 +11,6 @@ namespace SDLUI
     bool CreateRenderer();
     void SetupRenderer();
 
-    void Render();
+    void Render(CellMemberExperiment& experiment);
     void RunExperiment(CellMemberExperiment& experiment);
 }

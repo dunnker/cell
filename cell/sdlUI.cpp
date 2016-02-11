@@ -1,29 +1,77 @@
 #include <iostream>
+#include <memory>
 #include "sdlUI.h"
+#include "population.h"
+#include "ga.h"
 
 namespace SDLUI
 {
     SDL_Window* window;
     SDL_Renderer* renderer;
 
+    int generation;
+    std::unique_ptr<GA::Population<CellMember>> population;
+
     const int WINDOW_WIDTH = 1024;
     const int WINDOW_HEIGHT = 768;
 
-    void Render()
+    const int CELL_SIZE = 20;
+
+    const int MARGIN = 40;
+
+    const int POP_COUNT = 500;
+
+    SDL_Rect CreateCellRect(int x, int y)
     {
-        // Clear the window and make it all green
+        SDL_Rect rect;
+        rect.h = CELL_SIZE;
+        rect.w = CELL_SIZE;
+        rect.x = (x * CELL_SIZE) + MARGIN;
+        rect.y = (y * CELL_SIZE) + MARGIN;
+        return rect;
+    }
+
+    void Render(CellMemberExperiment& experiment)
+    {
         SDL_RenderClear(renderer);
 
-        // Change color to blue
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_Rect rect;
+        rect.h = (CELL_SIZE * WORLD_SIZE) + 2;
+        rect.w = (CELL_SIZE * WORLD_SIZE) + 2;
+        rect.x = MARGIN - 1;
+        rect.y = MARGIN - 1;
+        SDL_RenderDrawRect(renderer, &rect);
 
-        // Render our "player"
-        //SDL_RenderFillRect(renderer, &playerPos);
+        for (int x = 0; x < WORLD_SIZE; x++)
+        {
+            for (int y = 0; y < WORLD_SIZE; y++)
+            {
+                if (experiment.model[x][y])
+                {
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                    SDL_Rect rect = CreateCellRect(x, y);
+                    SDL_RenderFillRect(renderer, &rect);
+                }
 
-        // Change color to green
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                if (population != nullptr)
+                {
+                    CellMember& member = population->GetFittestMember();
+                    if (member._world[x][y].alive)
+                    {
+                        if (experiment.model[x][y])
+                            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                        else
+                            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                        SDL_Rect rect = CreateCellRect(x, y);
+                        SDL_RenderFillRect(renderer, &rect);
+                    }
+                }
+            }
+        }
 
-        // Render the changes above
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
         SDL_RenderPresent(renderer);
     }
 
@@ -82,20 +130,61 @@ namespace SDLUI
 
     void SetupRenderer()
     {
-        // Set size of renderer to the same as window
         SDL_RenderSetLogicalSize(renderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        // Set color of renderer to green
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    }
+
+    void Update()
+    {
+
+    }
+
+    void KeyDown(SDL_KeyboardEvent& key, CellMemberExperiment& experiment)
+    {
+        switch (key.keysym.sym)
+        {
+            case SDLK_s:
+            {
+                if (population == nullptr)
+                    population = std::make_unique<GA::Population<CellMember>>(*GA::GA<CellMember>::NewPopulation(POP_COUNT, experiment));
+                else
+                {
+                    generation += 1;
+                    population = std::make_unique<GA::Population<CellMember>>(*GA::GA<CellMember>::NewGeneration(*population, experiment));
+                }
+
+                GA::GA<CellMember>::EvaluatePopulation(*population, experiment);
+
+                CellMember& member = population->GetFittestMember();
+                std::cout << "Generation: " << generation << " Best Fitness: " << member.GetFitness() << "\n";
+
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    void MouseLeftButtonDown(SDL_MouseButtonEvent& button, CellMemberExperiment& experiment)
+    {
+        if (button.x >= MARGIN && button.y >= MARGIN)
+        {
+            int x = (button.x - MARGIN) / CELL_SIZE;
+            int y = (button.y - MARGIN) / CELL_SIZE;
+            if (x >= 0 && y >= 0 && x < WORLD_SIZE && y < WORLD_SIZE)
+            {
+                experiment.model[x][y] = !experiment.model[x][y];
+            }
+        }
     }
 
     void RunExperiment(CellMemberExperiment& experiment)
     {
         if (!InitEverything())
-            return;
+            throw "Error initializing SDL";
 
         bool loop = true;
-
         while (loop)
         {
             SDL_Event event;
@@ -104,29 +193,14 @@ namespace SDLUI
                 if (event.type == SDL_QUIT)
                     loop = false;
                 else if (event.type == SDL_KEYDOWN)
-                {
-                    switch (event.key.keysym.sym)
-                    {
-                    case SDLK_RIGHT:
-                        //++playerPos.x;
-                        break;
-                    case SDLK_LEFT:
-                        //--playerPos.x;
-                        break;
-                        // Remeber 0,0 in SDL is left-top. So when the user pressus down, the y need to increase
-                    case SDLK_DOWN:
-                        //++playerPos.y;
-                        break;
-                    case SDLK_UP:
-                        //--playerPos.y;
-                        break;
-                    default:
-                        break;
-                    }
-                }
+                    KeyDown(event.key, experiment);
+                else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
+                    MouseLeftButtonDown(event.button, experiment);
             }
 
-            Render();
+            Update();
+
+            Render(experiment);
 
             // Add a 16msec delay to make our game run at ~60 fps
             SDL_Delay(16);

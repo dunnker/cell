@@ -8,6 +8,13 @@ struct Cell
 {
     bool alive;
     unsigned short int generation;
+
+    Cell() :
+        alive(false),
+        generation(0)
+    {
+
+    }
 };
 
 const unsigned int WORLD_SIZE = 10;
@@ -25,7 +32,7 @@ public:
 
     NeuralNetwork::SingleHiddenLayerNetwork _network;
 
-    Cell _world[WORLD_SIZE - 1][WORLD_SIZE - 1];
+    Cell _world[WORLD_SIZE][WORLD_SIZE];
 
 private:
     float _fitness;
@@ -34,9 +41,16 @@ private:
 class CellMemberExperiment : public GA::Experiment<CellMember>
 {
 public:
+    CellMemberExperiment();
     virtual CellMember* NewMember();
     virtual void EvaluateMember(CellMember& member);
     virtual void Mutate(CellMember& member);
     virtual CellMember* NewFromCrossover(CellMember& member1, CellMember& member2);
+
+    bool model[WORLD_SIZE][WORLD_SIZE];
+
 private:
+    virtual void EvaluateCell(CellMember& member, int x, int y);
+    virtual void EvaluateCellOutputs(CellMember& member, int x, int y);
+    virtual void AssignPositionInputs(CellMember& member, unsigned short int index, int x, int y);
 };
