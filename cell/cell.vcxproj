@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cellMember.cpp" />
+    <ClCompile Include="classifierTest.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="sdlUI.cpp" />
@@ -19,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cellMember.h" />
+    <ClInclude Include="classifierTest.h" />
     <ClInclude Include="ga.h" />
     <ClInclude Include="member.h" />
     <ClInclude Include="network.h" />

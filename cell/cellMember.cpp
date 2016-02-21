@@ -36,7 +36,7 @@ CellMemberExperiment::CellMemberExperiment()
 CellMember* CellMemberExperiment::NewMember()
 {
     CellMember* result = new CellMember();
-    NeuralNetwork::NetworkUtils::InitializeSingleHiddenLayer(result->_network);
+    NeuralNetwork::NetworkUtils::Initialize(result->_network);
     return result;
 }
 
@@ -96,7 +96,7 @@ void CellMemberExperiment::EvaluateCell(CellMember& member, int x, int y)
     member._network._inputs[8] = member._world[x][y].generation;
     assert(member._network._inputs[9] > 0.999f && member._network._inputs[9] < 1.001f);
 
-    NeuralNetwork::NetworkUtils::FeedForwardSingleHiddenLayer(member._network);
+    NeuralNetwork::NetworkUtils::FeedForward(member._network);
 }
 
 void CellMemberExperiment::EvaluateMember(CellMember& member)
@@ -146,12 +146,12 @@ void CellMemberExperiment::EvaluateMember(CellMember& member)
 
 void CellMemberExperiment::Mutate(CellMember& member)
 {
-    NeuralNetwork::NetworkUtils::MutateSingleHiddenLayer(member._network);
+    NeuralNetwork::NetworkUtils::Mutate(member._network);
 }
 
 CellMember* CellMemberExperiment::NewFromCrossover(CellMember& member1, CellMember& member2)
 {
     CellMember* result = new CellMember();
-    NeuralNetwork::NetworkUtils::CrossoverSingleHiddenLayer(member1._network, member2._network, result->_network);
+    NeuralNetwork::NetworkUtils::Crossover(member1._network, member2._network, result->_network);
     return result;
 }

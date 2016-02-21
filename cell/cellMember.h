@@ -30,7 +30,7 @@ public:
     static const unsigned short int INPUT_COUNT = 9;
     static const unsigned short int OUTPUT_COUNT = 4;
 
-    NeuralNetwork::SingleHiddenLayerNetwork _network;
+    NeuralNetwork::Network _network;
 
     Cell _world[WORLD_SIZE][WORLD_SIZE];
 

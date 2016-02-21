@@ -3,6 +3,7 @@
 
 #include "xorNetwork.h"
 #include "cellMember.h"
+#include "classifierTest.h"
 
 int main(int argc, char *args[])
 {
@@ -11,8 +12,11 @@ int main(int argc, char *args[])
     //XORNetworkExperiment experiment;
     //ConsoleUI::RunExperiment<XORNetworkMember>(experiment);
 
-    CellMemberExperiment experiment;
-    SDLUI::RunExperiment(experiment);
+    ClassifierTestMemberExperiment experiment;
+    ConsoleUI::RunExperiment<ClassifierTestMember>(experiment);
+
+    //CellMemberExperiment experiment;
+    //SDLUI::RunExperiment(experiment);
 
     return 0;
 }

@@ -11,7 +11,7 @@ namespace ConsoleUI
     template<typename M>
     void RunExperiment(GA::Experiment<M>& experiment)
     {
-        auto population = std::make_unique<GA::Population<M>>(*GA::GA<M>::NewPopulation(10, experiment));
+        auto population = std::make_unique<GA::Population<M>>(*GA::GA<M>::NewPopulation(400, experiment));
         int generation = 0;
         while (true)
         {
@@ -20,7 +20,7 @@ namespace ConsoleUI
             M& member = population->GetFittestMember();
             std::cout << "Generation: " << generation << " Best Fitness: " << member.GetFitness() << "        Press <Enter> to continue\n";
 
-            getchar();
+            //getchar();
 
             population = std::make_unique<GA::Population<M>>(*GA::GA<M>::NewGeneration(*population, experiment));
             generation++;

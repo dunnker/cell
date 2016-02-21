@@ -15,7 +15,7 @@ public:
     static const unsigned short int INPUT_COUNT = 2;
     static const unsigned short int OUTPUT_COUNT = 1;
 
-    NeuralNetwork::SingleHiddenLayerNetwork _network;
+    NeuralNetwork::Network _network;
 
 private:
     float _fitness;

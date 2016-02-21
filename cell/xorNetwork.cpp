@@ -30,7 +30,7 @@ void XORNetworkMember::SetFitness(float value)
 XORNetworkMember* XORNetworkExperiment::NewMember()
 {
     XORNetworkMember* result = new XORNetworkMember();
-    NeuralNetwork::NetworkUtils::InitializeSingleHiddenLayer(result->_network);
+    NeuralNetwork::NetworkUtils::Initialize(result->_network);
     return result;
 }
 
@@ -41,7 +41,7 @@ float XORNetworkExperiment::GetXORFitness(XORNetworkMember& member, float truthV
 
 void XORNetworkExperiment::EvaluateInputs(XORNetworkMember& member, float expected)
 {
-    NeuralNetwork::NetworkUtils::FeedForwardSingleHiddenLayer(member._network);
+    NeuralNetwork::NetworkUtils::FeedForward(member._network);
     member.SetFitness(GetXORFitness(member, expected, member._network._outputs[0]));
 }
 
@@ -75,12 +75,12 @@ void XORNetworkExperiment::EvaluateMember(XORNetworkMember& member)
 
 void XORNetworkExperiment::Mutate(XORNetworkMember& member)
 {
-    NeuralNetwork::NetworkUtils::MutateSingleHiddenLayer(member._network);
+    NeuralNetwork::NetworkUtils::Mutate(member._network);
 }
 
 XORNetworkMember* XORNetworkExperiment::NewFromCrossover(XORNetworkMember& member1, XORNetworkMember& member2)
 {
     XORNetworkMember* result = new XORNetworkMember();
-    NeuralNetwork::NetworkUtils::CrossoverSingleHiddenLayer(member1._network, member2._network, result->_network);
+    NeuralNetwork::NetworkUtils::Crossover(member1._network, member2._network, result->_network);
     return result;
 }

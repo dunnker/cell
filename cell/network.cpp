@@ -9,7 +9,7 @@ namespace NeuralNetwork
         return rand() / (float)(RAND_MAX + 1);
     }
 
-    void NetworkUtils::InitializeSingleHiddenLayer(SingleHiddenLayerNetwork& network, float range)
+    void NetworkUtils::Initialize(Network& network, float range)
     {
         // assign random weight values between range
         for (int n = 0; n < network._inputNodeCount; n++)
@@ -17,6 +17,20 @@ namespace NeuralNetwork
             for (int w = 0; w < network._inputWeightCount; w++) 
             {
                 network._inputWeights[n][w] = (GetRandomFloat() * range) - (range / 2.0f);
+            }
+        }
+
+        if (network._hiddenLayerCount > 1)
+        {
+            for (int h = 0; h < network._hiddenLayerCount - 1; h++)
+            {
+                for (int n = 0; n < network._hiddenNodeCount; n++)
+                {
+                    for (int w = 0; w < network._hiddenWeightCount; w++)
+                    {
+                        network._hiddenWeights[h][n][w] = (GetRandomFloat() * range) - (range / 2.0f);
+                    }
+                }
             }
         }
 
@@ -38,14 +52,14 @@ namespace NeuralNetwork
         return 1.0f / (1.0f + powf(e, -value));
     }
 
-    void NetworkUtils::FeedForwardSingleHiddenLayer(SingleHiddenLayerNetwork& network)
+    void NetworkUtils::FeedForward(Network& network)
     {
-        unsigned short int hiddenSize = network._inputWeightCount + 1;
-        float hidden[SingleHiddenLayerNetwork::MAX_HIDDEN_COUNT]; // static sized array for performance
+        unsigned short int hiddenSize = network._inputWeightCount + 1; // +1 for bias
+        float hidden[Network::MAX_HIDDEN_LAYERS][Network::MAX_HIDDEN_COUNT]; // fixed size array for performance
         // set bias node
-        hidden[hiddenSize - 1] = 1.0f;
+        hidden[0][hiddenSize - 1] = 1.0f;
 
-        // iterate over nodes of hidden layer, skipping the last bias node
+        // iterate over nodes skipping the last bias node
         for (int i = 0; i < hiddenSize - 1; i++)
         {
             float sum = 0.0f;
@@ -53,7 +67,27 @@ namespace NeuralNetwork
             {
                 sum += network._inputs[j] * network._inputWeights[j][i];
             }
-            hidden[i] = SigmoidActivationFunction(sum);
+            hidden[0][i] = SigmoidActivationFunction(sum);
+        }
+
+        if (network._hiddenLayerCount > 1)
+        {
+            for (int h = 1; h < network._hiddenLayerCount; h++)
+            {
+                // set bias node
+                hidden[h][hiddenSize - 1] = 1.0f;
+
+                // iterate over nodes skipping the last bias node
+                for (int i = 0; i < hiddenSize - 1; i++)
+                {
+                    float sum = 0.0f;
+                    for (int j = 0; j < hiddenSize; j++)
+                    {
+                        sum += hidden[h - 1][j] * network._hiddenWeights[h - 1][j][i];
+                    }
+                    hidden[h][i] = SigmoidActivationFunction(sum);
+                }
+            }
         }
 
         for (int i = 0; i < network._outputCount; i++)
@@ -64,13 +98,13 @@ namespace NeuralNetwork
 
             for (int j = 0; j < hiddenSize; j++)
             {
-                sum += hidden[j] * network._outputWeights[j][i];
+                sum += hidden[network._hiddenLayerCount - 1][j] * network._outputWeights[j][i];
             }
             network._outputs[i] = SigmoidActivationFunction(sum);
         }
     }
 
-    void NetworkUtils::MutateSingleHiddenLayer(SingleHiddenLayerNetwork& network, float mutationRate, float mutationRange)
+    void NetworkUtils::Mutate(Network& network, float mutationRate, float mutationRange)
     {
         for (int i = 0; i < network._inputNodeCount; i++)
         {
@@ -78,6 +112,21 @@ namespace NeuralNetwork
             {
                 if (NeuralNetwork::NetworkUtils::GetRandomFloat() < mutationRate)
                     network._inputWeights[i][j] += (mutationRange * NeuralNetwork::NetworkUtils::GetRandomFloat()) - (mutationRange / 2.0f);
+            }
+        }
+
+        if (network._hiddenLayerCount > 1)
+        {
+            for (int h = 0; h < network._hiddenLayerCount - 1; h++)
+            {
+                for (int i = 0; i < network._hiddenNodeCount; i++)
+                {
+                    for (int j = 0; j < network._hiddenWeightCount; j++)
+                    {
+                        if (NeuralNetwork::NetworkUtils::GetRandomFloat() < mutationRate)
+                            network._hiddenWeights[h][i][j] += (mutationRange * NeuralNetwork::NetworkUtils::GetRandomFloat()) - (mutationRange / 2.0f);
+                    }
+                }
             }
         }
 
@@ -91,10 +140,10 @@ namespace NeuralNetwork
         }
     }
 
-    void NetworkUtils::CrossoverSingleHiddenLayer(SingleHiddenLayerNetwork& parent1, SingleHiddenLayerNetwork& parent2, SingleHiddenLayerNetwork& network)
+    void NetworkUtils::Crossover(Network& parent1, Network& parent2, Network& network)
     {
-        assert(NeuralNetwork::SingleHiddenLayerNetwork::CompareBounds(parent1, network));
-        assert(NeuralNetwork::SingleHiddenLayerNetwork::CompareBounds(parent2, network));
+        assert(NeuralNetwork::Network::CompareBounds(parent1, network));
+        assert(NeuralNetwork::Network::CompareBounds(parent2, network));
 
         // crossover input layer 
         // select random node in parent1, and assign weights from node 0 to that random node, to result
@@ -115,6 +164,31 @@ namespace NeuralNetwork
             for (int j = 0; j < network._inputWeightCount; j++)
             {
                 network._inputWeights[i][j] = parent2._inputWeights[i][j];
+            }
+        }
+
+        if (network._hiddenLayerCount > 1)
+        {
+            unsigned short int hiddenIndex = (unsigned short int)(NeuralNetwork::NetworkUtils::GetRandomFloat() * network._hiddenNodeCount);
+            assert(hiddenIndex >= 0 && hiddenIndex < network._hiddenNodeCount);
+
+            for (int h = 0; h < network._hiddenLayerCount - 1; h++)
+            {
+                for (int i = 0; i < hiddenIndex; i++)
+                {
+                    for (int j = 0; j < network._hiddenWeightCount; j++)
+                    {
+                        network._hiddenWeights[h][i][j] = parent1._hiddenWeights[h][i][j];
+                    }
+                }
+
+                for (int i = hiddenIndex; i < network._hiddenNodeCount; i++)
+                {
+                    for (int j = 0; j < network._hiddenWeightCount; j++)
+                    {
+                        network._hiddenWeights[h][i][j] = parent2._hiddenWeights[h][i][j];
+                    }
+                }
             }
         }
 
